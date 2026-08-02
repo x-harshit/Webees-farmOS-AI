@@ -23,12 +23,14 @@
 
       <!-- Action Items -->
       <div class="nav-actions">
-        <button class="icon-btn" id="apiKeyBtn" title="Gemini API Key Settings" style="position:relative;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <button class="btn btn-outline" id="apiKeyBtn" title="Set Gemini API Key" style="gap:6px; font-size:0.85rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          <span>API Key</span>
+          <span id="navKeyDot" style="width:8px; height:8px; border-radius:50%; background-color:#cbd5e1; display:inline-block;"></span>
         </button>
-        <button class="icon-btn" id="historyBtn" title="Scan History">
+        <button class="icon-btn" id="historyBtn" title="Private Scan History">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          <span class="badge" id="historyBadge">1</span>
+          <span class="badge" id="historyBadge">0</span>
         </button>
         <button class="btn btn-primary" id="newScanNavBtn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -239,12 +241,22 @@
   <!-- History Drawer -->
   <div class="drawer-overlay hidden" id="historyDrawer">
     <div class="drawer-content">
-      <div class="drawer-header">
-        <h3>Recent Scan History</h3>
+      <div class="drawer-header" style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <h3 style="margin:0;">Private Scan History</h3>
+          <p style="font-size:0.75rem; color:var(--text-muted); margin:4px 0 0 0; display:flex; align-items:center; gap:4px;">
+            🔒 Stored locally on your device only
+          </p>
+        </div>
         <button class="close-drawer-btn" id="closeHistoryBtn">&times;</button>
       </div>
       <div class="drawer-body" id="historyList">
         <!-- History items dynamically loaded -->
+      </div>
+      <div style="padding:16px; border-top:1px solid var(--border-color, #e2e8f0); display:flex; justify-content:space-between; align-items:center;">
+        <button type="button" class="btn btn-outline" id="clearHistoryBtn" style="color:#ef4444; border-color:#fca5a5; font-size:0.8rem; padding:6px 12px;">
+          🗑️ Clear All History
+        </button>
       </div>
     </div>
   </div>
@@ -265,25 +277,33 @@
     </div>
   </div>
 
-  <!-- API Key Settings Modal -->
+  <!-- API Key Settings Modal (Direct Browser Embed) -->
   <div class="modal-overlay hidden" id="apiKeyModal">
-    <div class="modal-card" style="max-width:480px; padding:24px;">
+    <div class="modal-card" style="max-width:500px; padding:24px;">
       <button class="close-modal-btn" id="closeApiKeyBtn">&times;</button>
       <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
-        <span style="font-size:1.5rem;">🔑</span>
-        <h3 style="margin:0; font-size:1.2rem; font-weight:700;">Gemini AI API Key (Optional)</h3>
+        <span style="font-size:1.6rem;">🔑</span>
+        <div>
+          <h3 style="margin:0; font-size:1.2rem; font-weight:700;">Direct Browser API Key Embed</h3>
+          <span id="apiKeyStatusBadge" style="display:inline-block; font-size:0.72rem; font-weight:600; padding:2px 8px; border-radius:12px; background-color:#f1f5f9; color:#475569; margin-top:4px;">Checking status...</span>
+        </div>
       </div>
       <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.5; margin-bottom:16px;">
-        When hosting statically on Netlify or GitHub Pages, enter your free Google Gemini API Key below to perform live real-time AI vision analysis directly in your browser.
+        Add your Gemini API key directly in the browser! It gets saved in your browser storage (<code>localStorage</code>) so live AI vision analysis works everywhere (including Netlify) without touching any code.
       </p>
-      <div style="margin-bottom:16px;">
+      <div style="margin-bottom:16px; position:relative;">
         <label style="display:block; font-size:0.8rem; font-weight:600; text-transform:uppercase; margin-bottom:6px; color:var(--text-muted);">Google Gemini API Key</label>
-        <input type="password" id="apiKeyInput" placeholder="AIzaSy..." style="width:100%; padding:10px 12px; border:1px solid var(--border-color, #e2e8f0); border-radius:8px; font-size:0.9rem; font-family:monospace;">
-        <p style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Get a key for free at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="color:var(--primary); font-weight:600;">aistudio.google.com</a>. Saved only in your local browser.</p>
+        <div style="display:flex; gap:6px;">
+          <input type="password" id="apiKeyInput" placeholder="AIzaSy..." style="flex:1; padding:10px 12px; border:1px solid var(--border-color, #e2e8f0); border-radius:8px; font-size:0.9rem; font-family:monospace;">
+          <button type="button" id="toggleApiKeyVisibilityBtn" class="btn btn-outline" style="padding:0 12px; font-size:0.85rem;" title="Show/Hide Key">👁️</button>
+        </div>
+        <p style="font-size:0.75rem; color:var(--text-muted); margin-top:6px; line-height:1.4;">
+          Get your free API Key from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="color:var(--primary); font-weight:600;">Google AI Studio</a>. Saved privately on your device.
+        </p>
       </div>
       <div style="display:flex; gap:10px; justify-content:flex-end;">
         <button type="button" class="btn btn-outline" id="clearApiKeyBtn">Clear Key</button>
-        <button type="button" class="btn btn-primary" id="saveApiKeyBtn">Save Settings</button>
+        <button type="button" class="btn btn-primary" id="saveApiKeyBtn">Embed Key in Browser</button>
       </div>
     </div>
   </div>

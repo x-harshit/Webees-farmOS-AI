@@ -26,16 +26,29 @@ document.addEventListener('DOMContentLoaded', () => {
   let uploadedImageSrc = null;
   let isHealthySampleSelected = false;
   let activeLanguage = "en";
-  let scanHistory = [
-    {
-      id: 1,
-      plant: "Tomato",
-      disease: "Early Blight (Alternaria solani)",
-      risk: "Severe Risk",
-      conf: "94%",
-      date: "Aug 02, 2026 09:45 AM"
+
+  // Private User Scan History stored in localStorage
+  let scanHistory = [];
+  try {
+    const savedHistory = localStorage.getItem('aifarmos_user_history');
+    if (savedHistory) {
+      scanHistory = JSON.parse(savedHistory);
+    } else {
+      scanHistory = [
+        {
+          id: 1,
+          plant: "Tomato",
+          disease: "Early Blight (Alternaria solani)",
+          risk: "Severe Risk",
+          conf: "94%",
+          date: "Aug 02, 2026 09:45 AM"
+        }
+      ];
+      localStorage.setItem('aifarmos_user_history', JSON.stringify(scanHistory));
     }
-  ];
+  } catch (e) {
+    scanHistory = [];
+  }
 
   // DOM Elements
   const plantGrid = document.getElementById('plantGrid');
@@ -201,13 +214,16 @@ document.addEventListener('DOMContentLoaded', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
-  // API Key Settings Modal & Effective Key Retrieval
+  // Direct Browser API Key Settings & Status Management
   const apiKeyBtn = document.getElementById('apiKeyBtn');
   const apiKeyModal = document.getElementById('apiKeyModal');
   const apiKeyInput = document.getElementById('apiKeyInput');
   const closeApiKeyBtn = document.getElementById('closeApiKeyBtn');
   const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
   const clearApiKeyBtn = document.getElementById('clearApiKeyBtn');
+  const apiKeyStatusBadge = document.getElementById('apiKeyStatusBadge');
+  const navKeyDot = document.getElementById('navKeyDot');
+  const toggleApiKeyVisibilityBtn = document.getElementById('toggleApiKeyVisibilityBtn');
 
   function getEffectiveApiKey() {
     const userKey = localStorage.getItem('gemini_api_key');
@@ -224,19 +240,52 @@ document.addEventListener('DOMContentLoaded', () => {
     return "";
   }
 
-  // Load saved key on startup
-  if (apiKeyInput) {
-    const activeKey = getEffectiveApiKey();
-    if (localStorage.getItem('gemini_api_key')) {
-      apiKeyInput.value = localStorage.getItem('gemini_api_key');
-    } else if (activeKey) {
-      apiKeyInput.placeholder = "Embedded Gemini API Key active (Enter custom key to override)";
+  function updateApiKeyStatusUI() {
+    const userKey = (localStorage.getItem('gemini_api_key') || '').trim();
+    const effectiveKey = getEffectiveApiKey();
+
+    if (navKeyDot) {
+      if (userKey || effectiveKey) {
+        navKeyDot.style.backgroundColor = '#22c55e'; // Green dot
+      } else {
+        navKeyDot.style.backgroundColor = '#cbd5e1'; // Grey dot
+      }
     }
+
+    if (apiKeyStatusBadge) {
+      if (userKey) {
+        apiKeyStatusBadge.textContent = '🟢 Custom Browser Key Active';
+        apiKeyStatusBadge.style.backgroundColor = '#dcfce7';
+        apiKeyStatusBadge.style.color = '#166534';
+      } else if (effectiveKey) {
+        apiKeyStatusBadge.textContent = '🟡 Embedded Key Active';
+        apiKeyStatusBadge.style.backgroundColor = '#fef9c3';
+        apiKeyStatusBadge.style.color = '#854d0e';
+      } else {
+        apiKeyStatusBadge.textContent = '⚪ No Key Set (Fallback AI Engine Active)';
+        apiKeyStatusBadge.style.backgroundColor = '#f1f5f9';
+        apiKeyStatusBadge.style.color = '#475569';
+      }
+    }
+  }
+
+  // Load saved key and status on startup
+  if (apiKeyInput) {
+    const userKey = localStorage.getItem('gemini_api_key') || '';
+    apiKeyInput.value = userKey;
+  }
+  updateApiKeyStatusUI();
+
+  if (toggleApiKeyVisibilityBtn && apiKeyInput) {
+    toggleApiKeyVisibilityBtn.addEventListener('click', () => {
+      apiKeyInput.type = apiKeyInput.type === 'password' ? 'text' : 'password';
+    });
   }
 
   if (apiKeyBtn) {
     apiKeyBtn.addEventListener('click', () => {
       apiKeyInput.value = localStorage.getItem('gemini_api_key') || '';
+      updateApiKeyStatusUI();
       apiKeyModal.classList.remove('hidden');
     });
   }
@@ -250,10 +299,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const val = apiKeyInput.value.trim();
       if (val) {
         localStorage.setItem('gemini_api_key', val);
-        alert('Custom Gemini API Key saved successfully! Live AI vision scanning is active.');
+        alert('✨ Gemini API Key embedded directly in browser! Live AI vision scanning is active for all scans.');
       } else {
         localStorage.removeItem('gemini_api_key');
       }
+      updateApiKeyStatusUI();
       apiKeyModal.classList.add('hidden');
     });
   }
@@ -262,7 +312,8 @@ document.addEventListener('DOMContentLoaded', () => {
     clearApiKeyBtn.addEventListener('click', () => {
       localStorage.removeItem('gemini_api_key');
       apiKeyInput.value = '';
-      alert('Custom key cleared. Default active environment key will be used if present.');
+      updateApiKeyStatusUI();
+      alert('Custom key removed from browser storage.');
       apiKeyModal.classList.add('hidden');
     });
   }
@@ -555,7 +606,7 @@ Respond strictly with valid JSON without any markdown formatting or code blocks:
 
     reportModal.classList.remove('hidden');
 
-    // Add to Scan History
+    // Add to Scan History & save privately to local browser storage
     const newScan = {
       id: Date.now(),
       plant: crop,
@@ -565,6 +616,9 @@ Respond strictly with valid JSON without any markdown formatting or code blocks:
       date: `${dateStr} ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
     };
     scanHistory.unshift(newScan);
+    try {
+      localStorage.setItem('aifarmos_user_history', JSON.stringify(scanHistory));
+    } catch (e) {}
     updateHistoryUI();
   }
 
@@ -755,15 +809,56 @@ Respond strictly with valid JSON without any markdown formatting or code blocks:
     };
   }
 
-  // History UI Update
+  // Private History UI Update
+  const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+
   function updateHistoryUI() {
     historyBadge.textContent = scanHistory.length;
+    if (scanHistory.length === 0) {
+      historyList.innerHTML = `
+        <div style="text-align:center; padding:40px 16px; color:var(--text-muted);">
+          <span style="font-size:2rem; display:block; margin-bottom:8px;">📋</span>
+          <strong style="display:block; color:var(--text-main); font-size:0.95rem; margin-bottom:4px;">No Scan History Yet</strong>
+          <span style="font-size:0.78rem;">Scans performed on this browser are saved here privately.</span>
+        </div>
+      `;
+      return;
+    }
+
     historyList.innerHTML = scanHistory.map(item => `
-      <div class="history-card">
-        <div class="history-card-title">${item.disease}</div>
-        <div class="history-card-sub">${item.date} • ${item.conf} Match</div>
+      <div class="history-card" style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div class="history-card-title">${item.disease}</div>
+          <div class="history-card-sub">${item.date} • ${item.conf} Match</div>
+        </div>
+        <button type="button" class="delete-history-item-btn" data-id="${item.id}" style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:0.9rem; padding:4px;" title="Delete this scan record">🗑️</button>
       </div>
     `).join('');
+
+    // Attach individual item delete event listeners
+    historyList.querySelectorAll('.delete-history-item-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = Number(btn.getAttribute('data-id'));
+        scanHistory = scanHistory.filter(h => h.id !== id);
+        try {
+          localStorage.setItem('aifarmos_user_history', JSON.stringify(scanHistory));
+        } catch (err) {}
+        updateHistoryUI();
+      });
+    });
+  }
+
+  if (clearHistoryBtn) {
+    clearHistoryBtn.addEventListener('click', () => {
+      if (confirm('Are you sure you want to clear your private scan history?')) {
+        scanHistory = [];
+        try {
+          localStorage.removeItem('aifarmos_user_history');
+        } catch (e) {}
+        updateHistoryUI();
+      }
+    });
   }
 
   historyBtn.addEventListener('click', () => historyDrawer.classList.remove('hidden'));

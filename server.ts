@@ -25,7 +25,7 @@ app.get(['/netlify-deploy.zip', '/public/netlify-deploy.zip'], (req, res) => {
 // Serve static frontend assets
 app.use(express.static(__dirname));
 
-const GEMINI_KEY = process.env.GEMINI_API_KEY || "AQ.Ab8RN6Krsk0FZKwl5IbWjCS_pdQ_shhjgJm-z8N1ePr2mklSbg";
+const GEMINI_KEY = process.env.GEMINI_API_KEY || "AQ.Ab8RN6KaRoZWaj-CPfev8fj1Up-l06OVoufLJfztDlHSoKZcWg";
 const ai = new GoogleGenAI({ apiKey: GEMINI_KEY });
 
 async function callGeminiWithFallback(ai: GoogleGenAI, contents: any[]) {

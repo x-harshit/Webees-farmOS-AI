@@ -22,7 +22,7 @@ function expressApiPlugin(): Plugin {
         res.sendFile(zipPath);
       });
 
-      const GEMINI_KEY = process.env.GEMINI_API_KEY || "AQ.Ab8RN6Krsk0FZKwl5IbWjCS_pdQ_shhjgJm-z8N1ePr2mklSbg";
+      const GEMINI_KEY = process.env.GEMINI_API_KEY || "AQ.Ab8RN6KaRoZWaj-CPfev8fj1Up-l06OVoufLJfztDlHSoKZcWg";
       const ai = new GoogleGenAI({ apiKey: GEMINI_KEY });
 
       async function callGeminiWithFallback(ai: GoogleGenAI, contents: any[]) {
@@ -179,7 +179,7 @@ Return a valid JSON object with the following exact keys:
 }
 
 export default defineConfig(() => {
-  const geminiApiKey = process.env.GEMINI_API_KEY || "AQ.Ab8RN6Krsk0FZKwl5IbWjCS_pdQ_shhjgJm-z8N1ePr2mklSbg";
+  const geminiApiKey = process.env.GEMINI_API_KEY || "AQ.Ab8RN6KaRoZWaj-CPfev8fj1Up-l06OVoufLJfztDlHSoKZcWg";
   return {
     base: './',
     plugins: [react(), tailwindcss(), expressApiPlugin()],
