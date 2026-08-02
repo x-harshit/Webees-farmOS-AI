@@ -1,0 +1,10 @@
+{
+  "name": "AI FarmOS - Plant Leaf Symptom & Disease Classifier",
+  "description": "AI-powered plant leaf symptom and disease classifier for instant crop health diagnosis with Gemini vision & microclimate analysis.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

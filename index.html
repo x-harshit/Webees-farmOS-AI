@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI FarmOS - Plant Leaf Symptom & Disease Classifier</title>
+  <meta name="description" content="AI-powered plant leaf symptom and disease classifier for instant crop health diagnosis.">
+  <!-- Google Fonts: Inter and Merriweather -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="top-nav">
+    <div class="nav-container">
+      <div class="brand">
+        <img src="https://png.pngtree.com/element_our/sm/20180411/sm_5ace0628840fa.png" alt="AI FarmOS Logo" class="brand-logo-img">
+        <span class="brand-name">AI FarmOS</span>
+      </div>
+
+      <!-- Action Items -->
+      <div class="nav-actions">
+        <button class="icon-btn" id="apiKeyBtn" title="Gemini API Key Settings" style="position:relative;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        </button>
+        <button class="icon-btn" id="historyBtn" title="Scan History">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span class="badge" id="historyBadge">1</span>
+        </button>
+        <button class="btn btn-primary" id="newScanNavBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Scan
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-content">
+    
+    <!-- Sub Bar -->
+    <div class="sub-bar">
+      <div class="sub-tab">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        Disease Detection
+      </div>
+      <button class="btn btn-outline" id="resetFormBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+        Reset Form
+      </button>
+    </div>
+
+    <!-- Title Banner -->
+    <section class="card title-card">
+      <span class="category-tag">Disease Detection</span>
+      <h1 class="main-heading">Plant Leaf Symptom & Disease Classifier</h1>
+      <p class="heading-subtext">Upload or take a clear photo of the affected leaves and enter the weather details to get an instant disease diagnosis powered by Gemini AI.</p>
+    </section>
+
+    <form id="diseaseForm" onsubmit="return false;">
+      
+      <!-- Step 1: Specimen Photo -->
+      <section class="card step-card" id="step1">
+        <div class="step-header">
+          <span class="step-num">1</span>
+          <div>
+            <h2 class="step-title">Leaf & Plant Specimen Photo</h2>
+            <p class="step-subtext">Upload or photograph affected leaf, stem, or fruit under daylight</p>
+          </div>
+        </div>
+
+        <div class="dropzone-container" id="dropzone">
+          <input type="file" id="fileInput" accept="image/*" class="file-input-hidden">
+          
+          <div class="dropzone-content" id="dropzoneEmpty">
+            <div class="upload-icon-circle">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#5C52E5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+            </div>
+            <h3 class="upload-title">Upload Leaf or Plant Specimen</h3>
+            <p class="upload-desc">Drag and drop a clear plant image, or select a photo from your camera or gallery.</p>
+            
+            <div class="upload-actions">
+              <button type="button" class="btn btn-primary" id="browseFilesBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                Browse Files
+              </button>
+              <button type="button" class="btn btn-secondary" id="fieldCameraBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                Field Camera
+              </button>
+            </div>
+
+            <!-- Quick Demo Samples -->
+            <div class="preset-samples">
+              <span class="preset-label">Or test with a sample:</span>
+              <button type="button" class="sample-chip" id="sampleDiseasedBtn">⚠️ Diseased Leaf (Blight)</button>
+              <button type="button" class="sample-chip" id="sampleHealthyBtn">🌿 Healthy Leaf</button>
+            </div>
+          </div>
+
+          <!-- Preview State -->
+          <div class="dropzone-preview hidden" id="dropzonePreview">
+            <img src="" id="previewImage" alt="Leaf Specimen Preview">
+            <div class="preview-info">
+              <span class="preview-filename" id="previewFilename">specimen.jpg</span>
+              <div class="preview-actions">
+                <button type="button" class="btn btn-secondary btn-sm" id="changePhotoBtn">Change Photo</button>
+                <button type="button" class="btn btn-danger btn-sm" id="removePhotoBtn">Remove</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Step 2: Field Observations & Weather -->
+      <section class="card step-card" id="step2">
+        <div class="step-header">
+          <span class="step-num">2</span>
+          <div>
+            <h2 class="step-title">Field Observations & Weather</h2>
+            <p class="step-subtext">Location weather and plant selection for evaluation</p>
+          </div>
+        </div>
+
+        <div class="step-body">
+          
+          <!-- Language Selection -->
+          <div class="inner-box lang-box">
+            <div class="lang-header">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5C52E5" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              <div>
+                <h4 class="box-title">PREFERRED LANGUAGE</h4>
+                <p class="box-subtext">Select output report language (Easy English or Hindi)</p>
+              </div>
+            </div>
+            <div class="lang-toggle-group">
+              <button type="button" class="lang-btn active" data-lang="en">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                English (Easy)
+              </button>
+              <button type="button" class="lang-btn" data-lang="hi">
+                Hindi (हिंदी)
+              </button>
+            </div>
+          </div>
+
+          <!-- Crop / Plant Type Selection -->
+          <div class="crop-section">
+            <div class="crop-header">
+              <label class="section-label">
+                CROP / PLANT TYPE <span class="required">(NECESSARY)</span>
+              </label>
+              <span class="variety-count">50+ Plant Varieties Available</span>
+            </div>
+
+            <!-- Custom Type / Selected display -->
+            <input type="text" class="form-input" id="plantInput" placeholder="Type or select plant name (e.g. Tomato, Rice, Wheat, Mango, Cotton...)" autocomplete="off">
+
+            <!-- Search Filter -->
+            <div class="search-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A0AEC0" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="plantSearchInput" placeholder="Filter 50+ plant types...">
+            </div>
+
+            <!-- Plant Tag Pills Container -->
+            <div class="plant-grid" id="plantGrid">
+              <!-- Dynamically populated tags -->
+            </div>
+          </div>
+
+          <!-- Field Notes -->
+          <div class="notes-section">
+            <label class="section-label optional-label">
+              FIELD NOTES / VISUAL OBSERVATIONS <span class="optional">(OPTIONAL)</span>
+            </label>
+            <textarea id="fieldNotesInput" class="form-textarea" rows="3" placeholder="e.g. Yellow spots appeared 2 days ago after heavy rain..."></textarea>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Submit Section -->
+      <div class="submit-container">
+        <button type="button" class="btn btn-submit" id="runDetectionBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+          Run Disease Detection
+        </button>
+      </div>
+
+    </form>
+  </main>
+
+  <!-- Analysis Loading Overlay Modal -->
+  <div class="modal-overlay hidden" id="loadingModal">
+    <div class="modal-card loading-card">
+      <div class="spinner-container">
+        <div class="pulse-ring"></div>
+        <div class="icon-center">🌱</div>
+      </div>
+      <h3 class="loading-title">Analyzing Plant Specimen</h3>
+      <p class="loading-step" id="loadingStepText">Scanning leaf surface and discoloration pattern...</p>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="loadingProgressBar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Disease Diagnostic Report Modal -->
+  <div class="modal-overlay hidden" id="reportModal">
+    <div class="modal-card report-card">
+      <button class="close-modal-btn" id="closeReportBtn">&times;</button>
+      
+      <div class="report-header">
+        <div class="report-badge-container" id="reportBadgeContainer">
+          <!-- Badges dynamically inserted -->
+        </div>
+        <h2 class="report-plant-title" id="reportTitle">Tomato - Early Blight (Alternaria solani)</h2>
+        <p class="report-date" id="reportDate">Diagnosed on Aug 02, 2026 • AI FarmOS Diagnostic Engine</p>
+      </div>
+
+      <div class="report-body" id="reportModalBody">
+        <!-- Content dynamically rendered -->
+      </div>
+
+      <div class="report-footer">
+        <button class="btn btn-primary" id="saveHistoryDoneBtn">Done & Save to History</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- History Drawer -->
+  <div class="drawer-overlay hidden" id="historyDrawer">
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <h3>Recent Scan History</h3>
+        <button class="close-drawer-btn" id="closeHistoryBtn">&times;</button>
+      </div>
+      <div class="drawer-body" id="historyList">
+        <!-- History items dynamically loaded -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Camera Modal Simulation -->
+  <div class="modal-overlay hidden" id="cameraModal">
+    <div class="modal-card camera-card">
+      <button class="close-modal-btn" id="closeCameraBtn">&times;</button>
+      <h3>Field Camera Capture</h3>
+      <div class="camera-viewport">
+        <div class="camera-grid-lines"></div>
+        <div class="camera-focus-ring"></div>
+        <p class="camera-hint">Align plant leaf inside the frame under clear daylight</p>
+      </div>
+      <div class="camera-controls">
+        <button type="button" class="btn btn-primary btn-lg" id="snapPhotoBtn">📸 Take Photo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- API Key Settings Modal -->
+  <div class="modal-overlay hidden" id="apiKeyModal">
+    <div class="modal-card" style="max-width:480px; padding:24px;">
+      <button class="close-modal-btn" id="closeApiKeyBtn">&times;</button>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+        <span style="font-size:1.5rem;">🔑</span>
+        <h3 style="margin:0; font-size:1.2rem; font-weight:700;">Gemini AI API Key (Optional)</h3>
+      </div>
+      <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.5; margin-bottom:16px;">
+        When hosting statically on Netlify or GitHub Pages, enter your free Google Gemini API Key below to perform live real-time AI vision analysis directly in your browser.
+      </p>
+      <div style="margin-bottom:16px;">
+        <label style="display:block; font-size:0.8rem; font-weight:600; text-transform:uppercase; margin-bottom:6px; color:var(--text-muted);">Google Gemini API Key</label>
+        <input type="password" id="apiKeyInput" placeholder="AIzaSy..." style="width:100%; padding:10px 12px; border:1px solid var(--border-color, #e2e8f0); border-radius:8px; font-size:0.9rem; font-family:monospace;">
+        <p style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Get a key for free at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" style="color:var(--primary); font-weight:600;">aistudio.google.com</a>. Saved only in your local browser.</p>
+      </div>
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button type="button" class="btn btn-outline" id="clearApiKeyBtn">Clear Key</button>
+        <button type="button" class="btn btn-primary" id="saveApiKeyBtn">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
